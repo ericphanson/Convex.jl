@@ -73,7 +73,7 @@ end
 # constr_size: m
 # var_to_ranges a dictionary mapping from variable id to (start_index, end_index)
 # where start_index and end_index are the start and end indexes of the variable in A
-function find_variable_ranges(constraints)
+function find_variable_ranges(constraints, id_to_variables)
     index = 0
     constr_size = 0
     var_to_ranges = Dict{UInt64, Tuple{Int, Int}}()
@@ -148,11 +148,14 @@ function conic_problem(p::Problem{T}) where {T}
     unique_conic_forms = UniqueConicForms()
     objective, objective_var_id = conic_form!(p, unique_conic_forms)
     constraints = unique_conic_forms.constr_list
+    conic_constr_to_constr = unique_conic_forms.conic_constr_to_constr
+    id_to_variables = unique_conic_forms.id_to_variables
+
     # var_to_ranges maps from variable id to the (start_index, stop_index) pairs of the columns of A corresponding to that variable
     # var_size is the sum of the lengths of all variables in the problem
     # constr_size is the sum of the lengths of all constraints in the problem
-    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints)
-    c = spzeros(T, var_size, 1)
+    var_size, constr_size, var_to_ranges = find_variable_ranges(constraints, id_to_variables)
+    c = spzeros(var_size, 1)
     objective_range = var_to_ranges[objective_var_id]
     c[objective_range[1]:objective_range[2]] .= 1
 
@@ -209,7 +212,7 @@ function conic_problem(p::Problem{T}) where {T}
         c = -c
     end
 
-    return c, A, b, cones, var_to_ranges, vartypes, constraints
+    return c, A, b, cones, var_to_ranges, vartypes, constraints, id_to_variables, conic_constr_to_constr
 end
 
 Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Constraint...) where {T<:Real} =

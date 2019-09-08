@@ -1,5 +1,8 @@
 @testset "Utilities" begin
 
+    @testset "clearmemory" begin
+        @test_deprecated Convex.clearmemory()
+    end
 
     using SparseArrays
     @testset "Parametrically typed problems with type $T" for T = [Float32, Float64, BigFloat]
