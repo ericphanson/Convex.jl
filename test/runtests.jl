@@ -4,6 +4,20 @@ using Test
 using SCS, ECOS, GLPKMathProgInterface
 
 
+
+function is_optimal(p::Convex.Problem)
+    if p.model === nothing
+        error("No model")
+    elseif p.model isa MOI.ModelLike
+        return p.status == MOI.OPTIMAL
+    elseif p.model isa MathProgBase.AbstractConicModel
+        return p.status == :Optimal
+    else
+        error("p.model unrecognized: $(typeof(p.model))")
+    end
+end
+
+
 # Seed random number stream to improve test reliability
 using Random
 Random.seed!(2)

@@ -7,50 +7,35 @@ import MathProgBase
 
 function solve!(problem::Problem,
                 s::MathProgBase.AbstractMathProgSolver;
-                kwargs...)
+                check_vexity = true,
+                verbose = true, 
+                warmstart = false)
     # TODO: warn about wiping out old model if warmstart=true?
     problem.model = MathProgBase.ConicModel(s)
-    return solve!(problem; kwargs...)
+
+    if check_vexity
+        vex = vexity(problem)
+    end
+
+    c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
+
+    # load MPB conic problem
+    m = problem.model
+    load_problem!(m, c, A, b, cones, vartypes)
+    if warmstart
+        set_warmstart!(m, problem, length(c), var_to_ranges)
+    end
+    # optimize MPB conic problem
+    MathProgBase.optimize!(m)
+
+    # populate the status, the primal (and possibly dual) solution
+    # and the primal (and possibly dual) variables with values
+    populate_solution!(m, problem, var_to_ranges, conic_constraints)
+    if problem.status != :Optimal && verbose
+        @warn "Problem status $(problem.status); solution may be inaccurate."
+    end
 end
 
-# function solve!(problem::Problem;
-#                 warmstart=false,
-#                 check_vexity=true,
-#                 verbose=true)
-
-#     if problem.model === nothing
-#         throw(ArgumentError(
-#             "The provided problem hasn't been initialized with a conic model.
-#             You can resolve this by passing in a `AbstractMathProgSolver`. For example,
-#             ```
-#             using ECOS
-#             solve!(problem, ECOSSolver())
-#             ```"
-#         ))
-#     end
-
-#     if check_vexity
-#         vex = vexity(problem)
-#     end
-
-#     c, A, b, cones, var_to_ranges, vartypes, conic_constraints = conic_problem(problem)
-
-#     # load MPB conic problem
-#     m = problem.model
-#     load_problem!(m, c, A, b, cones, vartypes)
-#     if warmstart
-#         set_warmstart!(m, problem, length(c), var_to_ranges)
-#     end
-#     # optimize MPB conic problem
-#     MathProgBase.optimize!(m)
-
-#     # populate the status, the primal (and possibly dual) solution
-#     # and the primal (and possibly dual) variables with values
-#     populate_solution!(m, problem, var_to_ranges, conic_constraints)
-#     if problem.status != :Optimal && verbose
-#         @warn "Problem status $(problem.status); solution may be inaccurate."
-#     end
-# end
 
 function set_warmstart!(m::MathProgBase.AbstractConicModel,
                         problem::Problem,

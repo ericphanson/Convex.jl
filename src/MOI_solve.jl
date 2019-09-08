@@ -189,12 +189,11 @@ function solve!(problem::Problem{T}, optimizer::MOI.ModelLike;
     MOIU.reset_optimizer(model, optimizer);
     MOIU.attach_optimizer(model);
     MOI.optimize!(model)
-    problem.MOI_model = model
+    problem.model = model
 
-    moi_populate_solution!(model, problem, var_to_ranges)
     # # populate the status, the primal (and possibly dual) solution
     # # and the primal (and possibly dual) variables with values
-    # populate_solution!(m, problem, var_to_ranges, conic_constraints)
+    moi_populate_solution!(model, problem, var_to_ranges)
     if problem.status != MOI.OPTIMAL && verbose
         @warn "Problem status $(problem.status); solution may be inaccurate."
     end

@@ -12,33 +12,32 @@ const Status = MOI.TerminationStatusCode
 mutable struct Solution{T<:Number}
     primal::Array{T, 1}
     dual::Array{T, 1}
-    status::Status
+    status::Union{Status, Symbol}
     optval::T
     has_dual::Bool
 end
 
-Solution(x::Array{T, 1}, status::Status, optval::T) where {T} =
+Solution(x::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
     Solution(x, T[], status, optval, false)
-Solution(x::Array{T, 1}, y::Array{T, 1}, status::Status, optval::T) where {T} =
+Solution(x::Array{T, 1}, y::Array{T, 1}, status::Union{Status, Symbol}, optval::T) where {T} =
     Solution(x, y, status, optval, true)
 
 mutable struct Problem{T<:Real}
     head::Symbol
     objective::AbstractExpr
     constraints::Array{Constraint}
-    status::Status
+    status::Union{Status, Symbol}
     optval::Union{Real,Nothing}
-    model::Union{MathProgBase.AbstractConicModel, Nothing}
-    solution::Solution
-    MOI_model::MOI.ModelLike
+    model::Union{MathProgBase.AbstractConicModel, MOI.ModelLike, Nothing}
+    solution::Union{Solution, Nothing}
 
     function Problem{T}(head::Symbol, objective::AbstractExpr,
-                     model::Union{MathProgBase.AbstractConicModel, Nothing},
+                     model::Union{MathProgBase.AbstractConicModel, MOI.ModelLike, Nothing},
                      constraints::Array=Constraint[]) where {T <: Real}
         if sign(objective)== Convex.ComplexSign()
             error("Objective can not be a complex expression")
         else
-            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, model)
+            return new(head, objective, constraints, MOI.OPTIMIZE_NOT_CALLED, nothing, model, nothing)
         end
     end
 end
@@ -51,6 +50,22 @@ function Problem{T}(head::Symbol, objective::AbstractExpr, constraints::Array=Co
 end
 
 Problem(args...) = Problem{Float64}(args...)
+
+
+function solve!(problem::Problem; kwargs...)
+
+    if problem.model === nothing
+        throw(ArgumentError(
+            "The provided problem hasn't been initialized with a conic model.
+            You can resolve this by passing in a `AbstractMathProgSolver`. For example,
+            ```
+            using ECOS
+            solve!(problem, ECOSSolver())
+            ```"
+        ))
+    end
+    return solve!(problem, problem.model; kwargs... )
+end
 
 # If the problem constructed is of the form Ax=b where A is m x n
 # returns:
