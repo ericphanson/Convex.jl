@@ -5,17 +5,14 @@ Pkg.develop(PackageSpec(path=joinpath(@__DIR__, "..")))
 Pkg.add(["BenchmarkTools", "SCS", "ECOS", "PkgBenchmark"])
 Pkg.resolve()
 
-using Convex: Convex
+using Convex: Convex, ProblemDepot
 using SCS: SCSSolver
 using ECOS: ECOSSolver
 using BenchmarkTools
 
 
-include("benchmarks/benchmarks.jl") # defines module Benchmarks
-
 const SUITE = BenchmarkGroup()
 
-SUITE["SCS"] = Benchmarks.suite(p -> Convex.solve!(p, SCSSolver(verbose=0)))
-SUITE["ECOS"] = Benchmarks.suite(p -> Convex.solve!(p, ECOSSolver(verbose=0));
-    exclude = [r"sdp", r"SDP"])
-SUITE["formulation"] = Benchmarks.suite(Convex.conic_problem)
+problems =  Regex[r"affine_dot_multiply_atom", r"affine_hcat_atom", r"exp_entropy_atom", r"socp_quad_form_atom", r"socp_sum_squares_atom", r"lp_norm_inf_atom", r"lp_maximum_atom", r"sdp_norm2_atom", r"sdp_lambda_min_atom", r"mip_integer_variables"]
+
+SUITE["formulation"] = ProblemDepot.benchmark_suite(Convex.conic_problem; include=problems)
