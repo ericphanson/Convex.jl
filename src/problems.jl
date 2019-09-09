@@ -155,7 +155,7 @@ function conic_problem(p::Problem{T}) where {T}
     # var_size is the sum of the lengths of all variables in the problem
     # constr_size is the sum of the lengths of all constraints in the problem
     var_size, constr_size, var_to_ranges = find_variable_ranges(constraints, id_to_variables)
-    c = spzeros(var_size, 1)
+    c = spzeros(T, var_size, 1)
     objective_range = var_to_ranges[objective_var_id]
     c[objective_range[1]:objective_range[2]] .= 1
 
