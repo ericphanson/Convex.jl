@@ -22,7 +22,6 @@ include("constraints/exp_constraints.jl")
 include("constraints/sdp_constraints.jl")
 include("solver_info.jl")
 include("problems.jl")
-include("MPB_solve.jl")
 include("MOI_solve.jl")
 
 ### affine atoms

@@ -5,7 +5,6 @@ module ProblemDepot
 using BenchmarkTools, Test
 using MathOptInterface
 const MOI = MathOptInterface
-using MathProgBase
 using Convex
 using LinearAlgebra
 using LinearAlgebra: eigen, I, opnorm
@@ -181,8 +180,6 @@ function is_optimal(p::Convex.Problem)
         error("No model")
     elseif p.model isa MOI.ModelLike
         return p.status == MOI.OPTIMAL
-    elseif p.model isa MathProgBase.AbstractConicModel
-        return p.status == :Optimal
     else
         error("p.model unrecognized: $(typeof(p.model))")
     end

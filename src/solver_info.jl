@@ -1,4 +1,3 @@
-import MathProgBase
 export can_solve_mip, can_solve_socp, can_solve_sdp, can_solve_exp
 
 # NOTE: Convex has been tested with the following solvers:
