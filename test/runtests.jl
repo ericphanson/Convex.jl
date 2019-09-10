@@ -4,20 +4,6 @@ using Test
 using SCS, ECOS, GLPKMathProgInterface
 
 
-
-function is_optimal(p::Convex.Problem)
-    if p.model === nothing
-        error("No model")
-    elseif p.model isa MOI.ModelLike
-        return p.status == MOI.OPTIMAL
-    elseif p.model isa MathProgBase.AbstractConicModel
-        return p.status == :Optimal
-    else
-        error("p.model unrecognized: $(typeof(p.model))")
-    end
-end
-
-
 # Seed random number stream to improve test reliability
 using Random
 Random.seed!(2)
@@ -41,21 +27,37 @@ end
 @testset "Convex" begin
     include("test_utilities.jl")
 
-    @testset "SCS" begin
-        run_tests(; exclude=[r"mip"]) do p
-            solve!(p, SCSSolver(verbose=0, eps=1e-6))
+    @testset "MPB" begin
+        @testset "SCS via MPB" begin
+            run_tests(; exclude=[r"mip"]) do p
+                solve!(p, SCSSolver(verbose=0, eps=1e-6))
+            end
+        end
+
+        @testset "ECOS via MPB" begin
+            run_tests(; exclude=[r"mip", r"sdp"]) do p
+                solve!(p, ECOSSolver(verbose=0))
+            end
+        end
+
+        @testset "GLPK MIP via MPB" begin
+            run_tests(; exclude=[r"socp", r"sdp", r"exp"]) do p
+                solve!(p, GLPKSolverMIP())
+            end
         end
     end
 
-    @testset "ECOS" begin
-        run_tests(; exclude=[r"mip", r"sdp"]) do p
-            solve!(p, ECOSSolver(verbose=0))
+    @testset "MOI" begin
+        @testset "SCS via MOI" begin
+            run_tests(; exclude=[r"mip"]) do p
+                solve!(p, SCS.Optimizer(verbose=0, eps=1e-6))
+            end
         end
-    end
 
-    @testset "GLPK MIP" begin
-        run_tests(; exclude=[r"socp", r"sdp", r"exp"]) do p
-            solve!(p, GLPKSolverMIP())
+        @testset "ECOS via MOI" begin
+            run_tests(; exclude=[r"mip", r"sdp"]) do p
+                solve!(p, ECOS.Optimizer(verbose=0))
+            end
         end
     end
 end
