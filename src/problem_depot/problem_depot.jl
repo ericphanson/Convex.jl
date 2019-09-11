@@ -194,17 +194,6 @@ macro add_problem(prefix, q)
     end
 end
 
-
-function is_optimal(p::Convex.Problem)
-    if p.model === nothing
-        error("No model")
-    elseif p.model isa MOI.ModelLike
-        return p.status == MOI.OPTIMAL
-    else
-        error("p.model unrecognized: $(typeof(p.model))")
-    end
-end
-
 include("problems/affine.jl")
 include("problems/constant.jl")
 include("problems/exp.jl")
