@@ -37,7 +37,7 @@
            ├─ real variable ($(Convex.show_id(x)))
            └─ 3
         
-        current status: not yet solved"""
+        current status: OPTIMIZE_NOT_CALLED"""
         
         x = ComplexVariable(2,3)
         @test sprint(show, x) == """
@@ -51,7 +51,7 @@
         x = Variable(2)
         y = Variable(2)
         p = minimize(sum(x), hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))) == hcat(hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y))),hcat(hcat(hcat(x,y), hcat(x,y)),hcat(hcat(x,y), hcat(x,y)))))
-        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: not yet solved" 
+        @test sprint(show, p) == "minimize\n└─ sum (affine; real)\n   └─ 2-element real variable ($(Convex.show_id(x)))\nsubject to\n└─ == constraint (affine)\n   ├─ hcat (affine; real)\n   │  ├─ hcat (affine; real)\n   │  │  ├─ …\n   │  │  └─ …\n   │  └─ hcat (affine; real)\n   │     ├─ …\n   │     └─ …\n   └─ hcat (affine; real)\n      ├─ hcat (affine; real)\n      │  ├─ …\n      │  └─ …\n      └─ hcat (affine; real)\n         ├─ …\n         └─ …\n\ncurrent status: OPTIMIZE_NOT_CALLED" 
     end
 
     @testset "clearmemory" begin
