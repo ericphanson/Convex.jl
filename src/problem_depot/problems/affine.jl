@@ -513,9 +513,8 @@ end
     x = Variable(3)
     p = minimize(sum(x), x >= 1, Diagonal(x)[1, 2] == 1; numeric_type = T)
 
-    output = handle_problem!(p)
+    handle_problem!(p)
     if test
-        @test output === nothing
         @test p.status != MOI.OPTIMAL
     end
 end
