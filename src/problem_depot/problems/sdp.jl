@@ -382,7 +382,7 @@ end
     end
 end
 
-@add_problem sdp function sdp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
+@add_problem sdp function sdp_socp_abs_atom(handle_problem!, ::Val{test}, atol, rtol, ::Type{T}) where {T, test}
     a = [5-4im]
     x = ComplexVariable()
     objective = abs(a-x)
