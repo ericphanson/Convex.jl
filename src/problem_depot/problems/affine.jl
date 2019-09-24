@@ -592,10 +592,7 @@ end
 
     handle_problem!(p)
     if test
-        if p.solution.has_dual
-            println("Solution object has dual value, checking for dual correctness.")
-                @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
-        end
+        @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
     end
 
     x = Variable()
@@ -603,10 +600,7 @@ end
 
     handle_problem!(p)
     if test
-        if p.solution.has_dual
-        println("Solution object has dual value, checking for dual correctness.")
-            @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
-        end
+        @test p.constraints[1].dual ≈ 1 atol=atol rtol=rtol
     end
 
     x = Variable()
@@ -614,11 +608,8 @@ end
 
     handle_problem!(p)
     if test
-        if p.solution.has_dual
-        println("Solution object has dual value, checking for dual correctness.")
-            @test p.constraints[1].dual ≈ 0 atol=atol rtol=rtol
-            @test abs.(p.constraints[2].dual) ≈ 1 atol=atol rtol=rtol
-        end
+        @test p.constraints[1].dual ≈ 0 atol=atol rtol=rtol
+        @test abs.(p.constraints[2].dual) ≈ 1 atol=atol rtol=rtol
     end
 
     x = Variable(2)
@@ -627,11 +618,8 @@ end
 
     handle_problem!(p)
     if test
-        if p.solution.has_dual
-        println("Solution object has dual value, checking for dual correctness.")
         dual = [4/3; 4/3]
-            @test all(abs.(p.constraints[1].dual - dual) .<= atol)
-        end
+        @test all(abs.(p.constraints[1].dual - dual) .<= atol)
     end
 end
 
