@@ -219,8 +219,8 @@ function moi_populate_solution!(model::MOI.ModelLike, problem, var_to_ranges, id
     if dual_status != MOI.NO_SOLUTION
         for (idx, constr) in enumerate(constraints)
             haskey(conic_constr_to_constr, constr) || continue
-            MOI_constsr_idx = constraint_indices[idx]
-            dual_value = MOI.get(model, MOI.ConstraintDual(), MOI_constsr_idx)
+            MOI_constr_idx = constraint_indices[idx]
+            dual_value = MOI.get(model, MOI.ConstraintDual(), MOI_constr_idx)
             if length(dual_value) == 1
                 dual_value = dual_value[]
             end
